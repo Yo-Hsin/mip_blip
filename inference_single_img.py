@@ -11,6 +11,7 @@ from PIL import Image
 
 
 THRES = 2e-5
+ALGO = 'greedy'
 
 
 def parse_arguments():
@@ -82,6 +83,15 @@ def compute_attn_map(
     return gradcam, txt_tokens
 
 
+def compute_boxes(coords):
+    min_h = min(coords, key=lambda x: x[0])[0]
+    min_w = min(coords, key=lambda x: x[1])[1]
+    max_h = max(coords, key=lambda x: x[0])[0] + 1
+    max_w = max(coords, key=lambda x: x[1])[1] + 1
+
+    return min_h, min_w, max_h, max_w
+
+
 def dfs(mask, h, w, coords):
     height, width = mask.shape
 
@@ -100,6 +110,7 @@ def dfs(mask, h, w, coords):
 
     return size
 
+
 def largest_connected_component(mask):
     height, width = mask.shape
 
@@ -115,13 +126,16 @@ def largest_connected_component(mask):
                     max_size = cur_size
                     max_coords = copy.deepcopy(coords)
 
-    min_h = min(max_coords, key=lambda x: x[0])[0]
-    min_w = min(max_coords, key=lambda x: x[1])[1]
-    max_h = max(max_coords, key=lambda x: x[0])[0]
-    max_w = max(max_coords, key=lambda x: x[1])[1]
+    return compute_boxes(max_coords)
 
-    return min_h, min_w, max_h, max_w
 
+def greedy(mask, h, w):
+    coords = []
+
+    size = dfs(mask, h, w, coords)
+
+    return compute_boxes(coords)
+    
 
 def crop_image(gradcam, image, save_path):
     width, height = image.size
@@ -133,7 +147,14 @@ def crop_image(gradcam, image, save_path):
 
     binary_mask = (gradcam > THRES)
 
-    min_h, min_w, max_h, max_w = largest_connected_component(binary_mask)
+    if ALGO == 'LCC':
+        min_h, min_w, max_h, max_w = largest_connected_component(binary_mask)
+    elif ALGO == 'greedy':
+        argmax_h = np.argmax(gradcam) // 24
+        argmax_w = np.argmax(gradcam) % 24
+        min_h, min_w, max_h, max_w = greedy(binary_mask, argmax_h, argmax_w)
+    else:
+        print('Please select one of the algorithms: "LCC", "greedy".')
 
     min_w = min_w * w_scale
     min_h = min_h * h_scale
