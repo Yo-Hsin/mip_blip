@@ -12,6 +12,7 @@ from PIL import Image
 
 THRES = 2e-5
 ALGO = 'greedy'
+TOKEN = 7  # -1: whole sentence; 1: person; 7: emotion
 
 
 def parse_arguments():
@@ -132,10 +133,10 @@ def largest_connected_component(mask):
 def greedy(mask, h, w):
     coords = []
 
-    size = dfs(mask, h, w, coords)
+    _ = dfs(mask, h, w, coords)
 
     return compute_boxes(coords)
-    
+
 
 def crop_image(gradcam, image, save_path):
     width, height = image.size
@@ -203,17 +204,17 @@ def main(args):
         txt_processors,
         device
     )
-    plot_image(gradcam[0][1], os.path.join(args.save_path, 'gradcam.jpg'))
+    plot_image(gradcam[0][TOKEN + 2], os.path.join(args.save_path, 'gradcam.jpg'))
 
     crop_image(
-        gradcam[0][1].numpy(),
+        gradcam[0][TOKEN + 2].numpy(),
         resized_img,
         os.path.join(args.save_path, 'crop.jpg')
     )
 
     avg_gradcam = getAttMap(
         norm_img,
-        gradcam[0][1].numpy(),
+        gradcam[0][TOKEN + 2].numpy(),
         blur=True
     )
     plot_image(
