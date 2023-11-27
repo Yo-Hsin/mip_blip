@@ -18,9 +18,7 @@ def image_captioning(model_name, image_path):
     device = 'cpu'
 
     processor = Blip2Processor.from_pretrained(model_name)
-    model = Blip2ForConditionalGeneration.from_pretrained(
-        model_name, load_in_8bit=True, device_map={"": 0}, torch_dtype=torch.float16
-    )
+    model = Blip2ForConditionalGeneration.from_pretrained(model_name)
 
     image = Image.open(image_path).convert('RGB')
     inputs = processor(images=image, return_tensors="pt").to(device, torch.float16)
