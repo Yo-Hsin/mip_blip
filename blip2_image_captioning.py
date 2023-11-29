@@ -14,21 +14,32 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def image_captioning(model_name, image_path):
+def image_captioning(model, processor, image_path):
     device = 'cpu'
-
-    processor = Blip2Processor.from_pretrained(model_name)
-    model = Blip2ForConditionalGeneration.from_pretrained(model_name)
 
     image = Image.open(image_path).convert('RGB')
     inputs = processor(images=image, return_tensors="pt").to(device, torch.float16)
 
-    generated_ids = model.generate(**inputs)
+    generated_ids = model.generate(
+        **inputs,
+        do_sample=True,
+        max_length=256,
+        min_length=1,
+        top_p=0.9,
+        temperature=1,
+        repetition_penalty=1.5,
+        length_penalty=1.0,
+    )
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
 
-    print(generated_text)
+    return generated_text
 
 
 if __name__ == '__main__':
     args = parse_arguments()
-    image_captioning(args.model_name, args.image_path)
+
+    processor = Blip2Processor.from_pretrained(model_name)
+    model = Blip2ForConditionalGeneration.from_pretrained(model_name)
+
+    generated_text = image_captioning(model, processor, args.image_path)
+    print(generated_text)
