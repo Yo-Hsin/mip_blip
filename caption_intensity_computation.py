@@ -10,12 +10,13 @@ nltk.download('vader_lexicon')
 
 #caption = "A crowd of people standing in front of a street, one holding a sign and looking to her left." # people standing
 #caption = "The large crowd of people is gathering for the people to arrive" # large crowd
+#caption = "A girl sits on the bed and is afraid to hear something from her mother" # girl sits
 
 
 def parse_arguments():
     parser = ArgumentParser()
     parser.add_argument(
-        'caption', type=str, 
+        '--caption', type=str, 
         default='A girl sits on the bed and is afraid to hear something from her mother') # girl sits
     return parser.parse_args()
 
