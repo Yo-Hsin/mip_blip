@@ -14,9 +14,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def image_captioning(model, processor, image_path):
-    device = 'cpu'
-
+def image_captioning(model, processor, image_path, device='cpu'):
     image = Image.open(image_path).convert('RGB')
     inputs = processor(images=image, return_tensors="pt").to(device, torch.float16)
 

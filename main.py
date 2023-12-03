@@ -1,6 +1,7 @@
 import glob
 import os
 
+import torch
 from argparse import ArgumentParser
 from tqdm.auto import tqdm
 from transformers import Blip2Processor, Blip2ForConditionalGeneration
@@ -21,8 +22,14 @@ def parse_arguments():
 
 
 def main(args):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
     processor = Blip2Processor.from_pretrained(args.blip2_model_name)
-    model = Blip2ForConditionalGeneration.from_pretrained(args.blip2_model_name)
+
+    if device == 'cuda':
+        model = Blip2ForConditionalGeneration.from_pretrained(args.blip2_model_name, torch_dtype=torch.float16, device_map={"": 1})
+    else:
+        model = Blip2ForConditionalGeneration.from_pretrained(args.blip2_model_name)
 
     image_paths = glob.glob(f'{args.image_root}/**/*.jpg')
 
@@ -33,7 +40,7 @@ def main(args):
         # if os.path.basename(image_path) in comp_imgs:
         #     continue
 
-        caption = image_captioning(model, processor, image_path)
+        caption = image_captioning(model, processor, image_path, device)
         most_intense_phrase = find_most_intense_phrase(caption)
         print(f'{os.path.basename(image_path)}#{caption}#{most_intense_phrase}', flush=True)
 
