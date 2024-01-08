@@ -10,9 +10,7 @@ from tqdm.auto import tqdm
 START = 936
 
 
-# AIzaSyDatSatRzbx0nT2hHTpdsJVhEmzIIdth38
-# AIzaSyCZaNGhjh3ucL-GqIzAPIVPQ0xqvWL2J2c
-GOOGLE_API_KEY = 'AIzaSyCZaNGhjh3ucL-GqIzAPIVPQ0xqvWL2J2c'  # os.getenv('GOOGLE_API_KEY')
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 genai.configure(api_key=GOOGLE_API_KEY)
 
 
