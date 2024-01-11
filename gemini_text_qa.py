@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 from tqdm.auto import tqdm
 
 
-START = 936
+START = 0
 
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
@@ -16,7 +16,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 
 def parse_arguments():
     parser = ArgumentParser()
-    parser.add_argument('--caption_file', type=str,default='./captions/GroupEmoW/blip2_flan_t5_xl_groupemow_val_neu.txt')
+    parser.add_argument('--caption_file', type=str,default='./captions/GroupEmoW/blip2_flan_t5_xl_groupemow_val_neg.txt')
     parser.add_argument('--model', type=str, default='gemini-pro')
     args = parser.parse_args()
     return args
@@ -59,7 +59,6 @@ if __name__ == '__main__':
     for image_path, caption in tqdm(zip(image_paths[START:], captions[START:]), total=len(image_paths[START:])):
         response = generate_content_from_text(caption, model)
         if len(response.candidates) > 0:
-            # print(f'{response.candidates[0].content.parts}', file=sys.stderr)
             print(f'{image_path}#{caption}#{response.text}', flush=True)
         else:
             print(f'{image_path}#{caption}#{caption}', flush=True)
