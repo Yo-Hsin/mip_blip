@@ -21,12 +21,12 @@ TOKEN = 7  # -1: whole sentence; 1: person; 7: emotion
 def parse_arguments():
     parser = ArgumentParser()
     parser.add_argument('--image_root', type=str,
-                        default='/nas/queue/group_affect/datasets/GAF_3.0/val')
+                        default='/nas/queue/group_affect/datasets/GroupEmoW/train')
     parser.add_argument('--model_name', type=str, default='blip_image_text_matching')
     parser.add_argument('--model_type', type=str, default='large')
     parser.add_argument('--question', type=str,
                         default='The person who has the most apparent emotion.')
-    parser.add_argument('--save_dir', type=str, default='./mip_images/GAF/blip_itm/val')
+    parser.add_argument('--save_dir', type=str, default='./mip_images/GroupEmoW/blip_itm/train')
     args = parser.parse_args()
     return args
 
@@ -173,7 +173,7 @@ def crop_image(gradcam, img, save_path):
     min_h, max_h = convert_to_original_scale(min_h, max_h, h_scale, height)
 
     crop_img = img.crop((min_w, min_h, max_w, max_h))
-    plot_image(crop_img, save_path)
+    crop_img.save(save_path)
 
 
 def per_token_visulization(
